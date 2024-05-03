@@ -32,6 +32,7 @@ POST /
     "sender": "alice",
     "recipient": "bob",
     "amount": 500,
+    "description": "payment for your invoice #5398753"
 }
 
 403 Forbidden
