@@ -15,6 +15,7 @@ Let's pick option 6.
 ```HTTP
 POST /
 {
+    "sender": "alice",
     "recipient": "bob",
     "amount": 5,
     "description": "payment for your invoice #5398753"
