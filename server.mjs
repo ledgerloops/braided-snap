@@ -15,6 +15,7 @@ export class Server {
   overdraftLimit;
   transactionsIn = [];
   transactionsOut = [];
+  listeners = [];
   constructor(actor, peer, port, peerPort, overdraftLimit) {
     this.server = createServer((req, res) => {
         this.handleRequest(req, res);
@@ -56,6 +57,12 @@ export class Server {
     } else {
       throw new Error(`Invalid transaction, unknown sender ${transaction.sender}`);
     }
+    this.listeners.forEach(res => {
+      res.sendUpdate({
+        version: [ this.getVersion() ],
+        body: JSON.stringify(this.getState(), null, 2) + '\n' + '\n'
+      });
+    });
     return transaction.id;
   }
   getState() {
@@ -78,7 +85,7 @@ export class Server {
     };
   }
   getVersion() {
-    return this.transactions.length - 1;
+    return `${this.transactionsIn.length}:${this.transactionsOut.length}`;
   }
   async sendTransaction(transaction) {
     const res = await fetch(`http://localhost:${this.peerPort}/`, {
@@ -87,7 +94,7 @@ export class Server {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + SECRETS[transaction.sender],
       },
-      body: JSON.stringify(transaction, null, 2),
+      body: JSON.stringify(transaction, null, 2) + '\n',
     });
     console.log(`Transaction to ${transaction.recipient} sent to remote server, ${res.status} ${res.statusText}`);
   }
@@ -125,23 +132,24 @@ export class Server {
       console.log('looking up transaction', transactionId);
       const parts = transactionId.split('-');
       if (parts[0] === this.actor) {
-        res.end(JSON.stringify(this.transactionsOut[parts[1]], null, 2));
+        res.end(JSON.stringify(this.transactionsOut[parts[1]], null, 2) + '\n');
       } else if (parts[0] === this.peer) {
-        res.end(JSON.stringify(this.transactionsIn[parts[1]], null, 2));
+        res.end(JSON.stringify(this.transactionsIn[parts[1]], null, 2) + '\n');
       } else {
         res.statusCode = 404;
         res.end();
       }
      } else if (req.method === 'GET' && req.url === '/') {
       if (req.subscribe) {
-        res.startSubscription({ onClose: _=> null })
+        res.startSubscription({ onClose: _=> null });
+        this.listeners.push(res);
       } else {
         res.statusCode = 200
       }
       // Send the current version
       res.sendUpdate({
-          version: [this.getVersion],
-          body: JSON.stringify(this.getState(), null, 2)
+          version: [ this.getVersion() ],
+          body: JSON.stringify(this.getState(), null, 2) + '\n'
       });
     }
   }

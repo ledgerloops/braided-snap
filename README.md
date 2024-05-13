@@ -17,17 +17,21 @@ Alice's server runs on port 9935 and Bob's server runs on port 9936. You can use
 
 In one window:
 ```
-node alice.mjs
+node bob.mjs
 ```
 
 In another window:
 ```
-node bob.mjs
+curl -H 'Authorization: Bearer bob-secret' -H 'Subscribe: true' http://localhost:9936/
 ```
 
 In a third window:
 ```
+node alice.mjs
+```
+
+In a fourth window:
+```
 curl -H 'Authorization: Bearer alice-secret' http://localhost:9935/
-curl -H 'Authorization: Bearer bob-secret' http://localhost:9936/
 curl -H 'Authorization: Bearer bob-secret' http://localhost:9936/transaction/alice-0
 ```
