@@ -1,8 +1,8 @@
-import { startServer } from './shared.mjs';
+import { Server } from './server.mjs';
 
 async function run() {
-  const serverPromise = startServer("bob");
-  return serverPromise;
+  const server = new Server("bob", 9936);
+  server.run();
 }
 // ...
 run();
