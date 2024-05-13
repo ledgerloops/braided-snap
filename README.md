@@ -36,3 +36,16 @@ In a fourth window:
 curl -H 'Authorization: Bearer alice-secret' http://localhost:9935/
 curl -H 'Authorization: Bearer bob-secret' http://localhost:9936/transaction/alice-0
 ```
+
+
+While implementing this I ran through a lot of interesting questions.
+In the end the key to the solution I chose is to:
+* have a four-corner architecture (Alice client -> Alice server -> Bob server -> Bob client)
+* servers don't subscribe to each other; they don't need to, because they immediately post every transaction to each other. but a client can subscribe to a server.
+* only have two accounts, and two bearer tokens that give authority to send money from each of them
+* simple overdraft check both on the sending server and the receiving server
+* simple in-memory data storage (no way to recover from restart)
+* treat the ledger as two arrays of transactions, balance is derived on-the-fly when needed
+* transaction id's are derived simply from their place in the array
+* ledger version numbers are a concatenation of number of transactions on record for each account
+* but in alphabetical order by account name, so they two servers will label versions in the same way (see #2)
