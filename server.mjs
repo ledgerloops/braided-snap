@@ -1,5 +1,5 @@
 import { createServer } from 'http';
-import { http_server as braidify, fetch } from 'braid-http';
+import { http_server as braidify } from 'braid-http';
 
 const SECRETS = {
   "alice": "alice-secret",

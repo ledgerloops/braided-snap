@@ -50,3 +50,5 @@ In the end the key to the solution I chose is to:
 * ledger version numbers are a concatenation of number of transactions on record for each account
 * but in alphabetical order by account name, so they two servers will label versions in the same way (see https://github.com/ledgerloops/braided-snap/issues/2)
 * just posting transactions makes it all very easy - no need to do patches on account balance etc.
+* the POST messages don't actually use Braid, only the `GET /` does (you can do a normal GET of the ledger state, or subscribe to it)
+* I <3 Braid, so much fun! Looking forward to chatting more about this at [P4P Unconference 2024](https://offline.place/events/2024/05/24/p4p-unconference/)!
