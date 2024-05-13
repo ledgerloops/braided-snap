@@ -49,3 +49,4 @@ In the end the key to the solution I chose is to:
 * transaction id's are derived simply from their place in the array
 * ledger version numbers are a concatenation of number of transactions on record for each account
 * but in alphabetical order by account name, so they two servers will label versions in the same way (see https://github.com/ledgerloops/braided-snap/issues/2)
+* just posting transactions makes it all very easy - no need to do patches on account balance etc.
