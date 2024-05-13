@@ -85,7 +85,12 @@ export class Server {
     };
   }
   getVersion() {
-    return `${this.transactionsIn.length}:${this.transactionsOut.length}`;
+    if (this.actor < this.peer) {
+      return `${this.transactionsOut.length}:${this.transactionsIn.length }`;
+    } else {
+      return `${this.transactionsIn.length }:${this.transactionsOut.length}`;
+    
+    }
   }
   async sendTransaction(transaction) {
     const res = await fetch(`http://localhost:${this.peerPort}/`, {
