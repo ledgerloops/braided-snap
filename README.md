@@ -6,7 +6,7 @@ The each have a copy of the ledger, which is structured as two lists of transact
 When a server receives a new transaction from the local client, it validates it and posts it to the other server.
 
 A transaction id is defined as `actor` plus `'-'` plus an incremental number starting at `0`.
-So the first transaction from Alice has id `alice-1`.
+So the first transaction from Alice has id `alice-0`.
 
 A ledger state is defined by an alphabetical list of number of transactions from each actor, separated by `:`.
 
