@@ -18,7 +18,7 @@ export class Server {
   listeners = [];
   constructor(actor, peer, port, peerPort, overdraftLimit) {
     this.server = createServer((req, res) => {
-        this.handleRequest(req, res);
+      this.handleRequest(req, res);
     });
     this.actor = actor;
     this.peer = peer;
@@ -59,7 +59,7 @@ export class Server {
     }
     this.listeners.forEach(res => {
       res.sendUpdate({
-        version: [ this.getVersion() ],
+        version: [this.getVersion()],
         body: JSON.stringify(this.getState(), null, 2) + '\n' + '\n'
       });
     });
@@ -73,7 +73,7 @@ export class Server {
     for (const transaction of this.transactionsIn) {
       balance += transaction.amount;
     }
-    return { 
+    return {
       balance: {
         [this.actor]: balance,
         [this.peer]: -balance
@@ -86,10 +86,10 @@ export class Server {
   }
   getVersion() {
     if (this.actor < this.peer) {
-      return `${this.transactionsOut.length}:${this.transactionsIn.length }`;
+      return `${this.transactionsOut.length}:${this.transactionsIn.length}`;
     } else {
-      return `${this.transactionsIn.length }:${this.transactionsOut.length}`;
-    
+      return `${this.transactionsIn.length}:${this.transactionsOut.length}`;
+
     }
   }
   async sendTransaction(transaction) {
@@ -109,29 +109,29 @@ export class Server {
     if (req.method === 'POST') {
       let body = [];
       req
-      .on('data', chunk => {
-        body.push(chunk);
-      })
-      .on('end', () => {
-        body = Buffer.concat(body).toString();
-        const transaction = JSON.parse(body);
-        console.log(JSON.stringify(req.headers));
-        if (req.headers['authorization'] == 'Bearer ' + SECRETS[transaction.sender]) {
-          let newTransactionId;
-          try {
-            newTransactionId = this.addTransaction(transaction);
-          } catch (e) {
-            res.statusCode = 400;
-            res.end(e.message);
-            return;
+        .on('data', chunk => {
+          body.push(chunk);
+        })
+        .on('end', () => {
+          body = Buffer.concat(body).toString();
+          const transaction = JSON.parse(body);
+          console.log(JSON.stringify(req.headers));
+          if (req.headers['authorization'] == 'Bearer ' + SECRETS[transaction.sender]) {
+            let newTransactionId;
+            try {
+              newTransactionId = this.addTransaction(transaction);
+            } catch (e) {
+              res.statusCode = 400;
+              res.end(e.message);
+              return;
+            }
+            res.setHeader('Location', `/transaction/${newTransactionId}`);
+            if (transaction.sender === this.actor) {
+              this.sendTransaction(transaction);
+            }
           }
-          res.setHeader('Location', `/transaction/${newTransactionId}`);
-          if (transaction.sender === this.actor) {
-            this.sendTransaction(transaction);
-          }
-        }
-        res.end();
-      });
+          res.end();
+        });
     } else if (req.method === 'GET' && req.url.startsWith('/transaction/')) {
       const transactionId = req.url.split('/')[2];
       console.log('looking up transaction', transactionId);
@@ -144,18 +144,18 @@ export class Server {
         res.statusCode = 404;
         res.end();
       }
-     } else if (req.method === 'GET' && req.url === '/') {
+    } else if (req.method === 'GET' && req.url === '/') {
       res.setHeader('Content-Type', 'application/json');
       if (req.subscribe) {
-        res.startSubscription({ onClose: _=> null });
+        res.startSubscription({ onClose: _ => null });
         this.listeners.push(res);
       } else {
         res.statusCode = 200
       }
       // Send the current version
       res.sendUpdate({
-          version: [ this.getVersion() ],
-          body: JSON.stringify(this.getState(), null, 2) + '\n'
+        version: [this.getVersion()],
+        body: JSON.stringify(this.getState(), null, 2) + '\n'
       });
     }
   }
