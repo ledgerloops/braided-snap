@@ -145,6 +145,7 @@ export class Server {
         res.end();
       }
      } else if (req.method === 'GET' && req.url === '/') {
+      res.setHeader('Content-Type', 'application/json');
       if (req.subscribe) {
         res.startSubscription({ onClose: _=> null });
         this.listeners.push(res);
